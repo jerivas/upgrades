@@ -21,7 +21,8 @@ jobs:
           cache-dependency-path: requirements/*.txt
       - name: Upgrade dependencies
         run: |
-          pip install -U pip pip-tools
+          pip install -U pip-tools
+          pip install pip<22 # https://github.com/jazzband/pip-tools/issues/1558#issuecomment-1026009418
           pip-sync requirements/*.txt
           pip-compile --upgrade -o requirements/prod.txt requirements/prod.in
           pip-compile --upgrade -o requirements/dev.txt requirements/dev.in
