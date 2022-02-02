@@ -63,6 +63,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: python-deps
+          path: requirements
       - name: Download JS dependency changes
         uses: actions/download-artifact@v2
         with:
@@ -81,4 +82,6 @@ jobs:
           git add .
           git commit -m "Automated dependency upgrades"
           git push origin dependency-upgrades
-          gh pr create --fill
+          gh pr create \
+          --title "Automated dependency upgrades" \
+          --body "Full log: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
