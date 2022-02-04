@@ -19,11 +19,9 @@ jobs:
           python-version: '${{ env.PY_VERSION }}'
           cache: pip
           cache-dependency-path: requirements/*.txt
-      # TODO: go back to stable pip-tools once this is merged
-      # https://github.com/jazzband/pip-tools/pull/1567
       - name: Upgrade dependencies
         run: |
-          pip install -U pip git+https://github.com/di/pip-tools.git@get-ci-green#egg=pip-tools
+          pip install -U pip pip-tools
           pip-sync requirements/*.txt
           pip-compile --upgrade -o requirements/prod.txt requirements/prod.in
           pip-compile --upgrade -o requirements/dev.txt requirements/dev.in
