@@ -90,7 +90,7 @@ jobs:
           if [ -z $PR ]; then
             gh pr create \
             --head $BRANCH_NAME \
-            --title "$PR_TITLE" \
+            --title "Automated dependency upgrades" \
             --body "Full log: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           else
             echo "Pull request already exists, won't create a new one."
