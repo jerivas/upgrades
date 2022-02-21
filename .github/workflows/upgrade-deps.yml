@@ -1,7 +1,7 @@
 name: Upgrade dependencies
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # Allow running on-demand
   # schedule:
   #   # Every Monday at 10:00 UTC
   #   - cron: '0 10 * * 1'
@@ -44,8 +44,8 @@ jobs:
           cache: yarn
       - name: Upgrade dependencies
         run: |
-          yarn install
-          yarn upgrade --latest
+          rm -f yarn.lock
+          npx --yes yarn-upgrade-all
       - uses: actions/upload-artifact@v2
         with:
           name: js-deps
@@ -61,6 +61,8 @@ jobs:
       BRANCH_NAME: auto-dependency-upgrades
     steps:
       - uses: actions/checkout@v2
+        with:
+          ssh-key: ${{ secrets.DEPLOY_KEY }}
       - name: Download Python dependency changes
         uses: actions/download-artifact@v2
         with:
