@@ -1,7 +1,6 @@
-FROM oddbirds/pyjs:py3.10-node16
+FROM ghcr.io/oddbird/pyjs:py3.9-node16-headless
 
 ARG BUILD_ENV=development
-ARG PROD_ASSETS
 WORKDIR /app
 
 # Env setup:
@@ -24,8 +23,12 @@ RUN yarn install --check-files
 COPY . /app
 
 # Avoid building prod assets in development
-RUN if [ "${BUILD_ENV}" = "production" ] || [ -n "${PROD_ASSETS}" ] ; then yarn prod ; else mkdir -p dist ; fi
+RUN if [ "${BUILD_ENV}" = "production" ] ; then yarn prod ; else mkdir -p dist ; fi
 
-RUN python manage.py collectstatic --noinput
+RUN DATABASE_URL="" \
+  DB_ENCRYPTION_KEY="" \
+  DJANGO_HASHID_SALT="" \
+  DJANGO_SECRET_KEY="sample secret key" \
+  python manage.py collectstatic --noinput
 
 CMD /app/start-server.sh
