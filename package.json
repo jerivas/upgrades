@@ -18,7 +18,7 @@
     "serve": "run-p django:serve rq:serve vue:serve"
   },
   "dependencies": {
-    "is-sorted": "^1.0.0"
+    "is-sorted": "^1.0.5"
   },
   "resolutions": {
     "tslib": ">=2"
