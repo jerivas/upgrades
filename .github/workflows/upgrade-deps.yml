@@ -21,7 +21,7 @@ jobs:
           cache-dependency-path: requirements/*.txt
       - name: Upgrade dependencies
         run: |
-          python -m pip install --upgrade "pip<22.1" pip-tools
+          python -m pip install --upgrade pip pip-tools
           pip-compile --upgrade -o requirements/prod.txt requirements/prod.in
           pip-compile --upgrade -o requirements/dev.txt requirements/dev.in
       - uses: actions/upload-artifact@v3
