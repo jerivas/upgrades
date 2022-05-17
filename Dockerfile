@@ -1,4 +1,4 @@
-FROM ghcr.io/oddbird/pyjs:py3.9-node16-headless
+FROM ghcr.io/oddbird/pyjs:py3.10-node16
 
 ARG BUILD_ENV=development
 WORKDIR /app
@@ -25,10 +25,10 @@ COPY . /app
 # Avoid building prod assets in development
 RUN if [ "${BUILD_ENV}" = "production" ] ; then yarn prod ; else mkdir -p dist ; fi
 
-RUN DATABASE_URL="" \
-  DB_ENCRYPTION_KEY="" \
-  DJANGO_HASHID_SALT="" \
-  DJANGO_SECRET_KEY="sample secret key" \
-  python manage.py collectstatic --noinput
+# RUN DATABASE_URL="" \
+#   DB_ENCRYPTION_KEY="" \
+#   DJANGO_HASHID_SALT="" \
+#   DJANGO_SECRET_KEY="sample secret key" \
+#   python manage.py collectstatic --noinput
 
 CMD /app/start-server.sh
