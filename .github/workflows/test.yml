@@ -85,6 +85,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: backend-coverage
+      - run: ls -lah
       - name: Upload coverage reports
         run: |
           docker-compose run -e COVERALLS_REPO_TOKEN --no-deps web yarn test:js:report-coverage
