@@ -5,13 +5,91 @@ on:
     types: [reopened]
 
 concurrency:
-  group: ${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  COVERALLS_REPO_TOKEN: ${{ secrets.COVERALLS_REPO_TOKEN }}
+
 jobs:
-  test:
-    name: Test
+  build:
+    name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - run: echo "Just testing we can run commands"
+      - uses: actions/checkout@v3
+      - uses: ./.github/setup-docker-compose
+        with:
+          cache-to: type=gha,mode=max
+
+  lint:
+    name: Lint
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/setup-docker-compose
+      - name: Lint
+        run: docker-compose run --no-deps web yarn lint:nofix
+
+  frontend:
+    name: Frontend
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/setup-docker-compose
+      - name: Test frontend
+        run: docker-compose run --no-deps web yarn test:js:coverage
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-coverage
+          path: |
+            coverage
+
+  backend:
+    name: Backend
+    needs: [build]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/setup-docker-compose
+      - name: Test backend
+        run: >
+          docker-compose run -e DJANGO_DEBUG=false -e SECURE_SSL_REDIRECT=false
+          -e SFDX_CLIENT_SECRET="sample secret" -e
+          SFDX_CLIENT_CALLBACK_URL="sample callback" -e SFDX_CLIENT_ID="sample
+          id" -e SFDX_HUB_KEY="sample key" -e
+          DB_ENCRYPTION_KEY=MMkDMBfYL0Xoz3Xu1ENs3AkdCZdJoks5PNlUBkK7KDc= web
+          yarn test:py
+      - name: Upload coverage artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-coverage
+          path: |
+            .coverage
+            coverage.xml
+
+  coverage:
+    name: Coverage
+    needs: [frontend, backend]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/setup-docker-compose
+      - name: Download frontend coverage artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: frontend-coverage
+      - name: Download backend coverage artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: backend-coverage
+      - name: Upload coverage reports
+        run: |
+          docker-compose run -e COVERALLS_REPO_TOKEN --no-deps web yarn test:js:report-coverage
+          docker-compose run -e COVERALLS_REPO_TOKEN --no-deps web yarn test:py:report-coverage
+      - name: Check coverage
+        run: |
+          docker-compose run --no-deps web yarn test:js:check-coverage
+          docker-compose run --no-deps web yarn test:py:check-coverage

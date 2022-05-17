@@ -15,7 +15,13 @@
     "yarn": "^1.22"
   },
   "scripts": {
-    "serve": "run-p django:serve rq:serve vue:serve"
+    "test:py": "echo 'python coverage' > coverage.xml",
+    "lint:nofix": "echo 'linting...'",
+    "test:js:coverage": "mkdir coverage && echo 'js coverage' > coverage/coverage.txt",
+    "test:py:report-coverage": "pip list",
+    "test:js:report-coverage": "yarn list",
+    "test:py:check-coverage": "cat coverage.xml",
+    "test:js:check-coverage": "cat coverage/coverage.txt"
   },
   "dependencies": {
     "is-sorted": "^1.0.0"
