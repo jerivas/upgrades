@@ -81,6 +81,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: frontend-coverage
+          path: coverage
       - name: Download backend coverage artifacts
         uses: actions/download-artifact@v3
         with:

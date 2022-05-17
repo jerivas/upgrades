@@ -17,11 +17,11 @@
   "scripts": {
     "test:py": "echo 'python coverage' > coverage.xml",
     "lint:nofix": "echo 'linting...'",
-    "test:js:coverage": "mkdir coverage && echo 'js coverage' > coverage/coverage.txt",
+    "test:js:coverage": "mkdir coverage && echo 'foo' > coverage/foo.txt && echo 'baz' > coverage/baz.txt",
     "test:py:report-coverage": "pip list",
-    "test:js:report-coverage": "yarn list",
+    "test:js:report-coverage": "yarn list && ls -lah node_modules",
     "test:py:check-coverage": "cat coverage.xml",
-    "test:js:check-coverage": "cat coverage/coverage.txt"
+    "test:js:check-coverage": "cat coverage/foo.txt && cat coverage/baz.txt"
   },
   "dependencies": {
     "is-sorted": "^1.0.0"
