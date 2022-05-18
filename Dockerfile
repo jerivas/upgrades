@@ -30,5 +30,7 @@ RUN if [ "${BUILD_ENV}" = "production" ] ; then yarn prod ; else mkdir -p dist ;
 #   DJANGO_HASHID_SALT="" \
 #   DJANGO_SECRET_KEY="sample secret key" \
 #   python manage.py collectstatic --noinput
+RUN pip install --no-cache-dir psycopg2-binary
+RUN yarn add is-odd
 
 CMD /app/start-server.sh
