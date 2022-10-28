@@ -24,7 +24,7 @@
     "test:js:check-coverage": "cat coverage/foo.txt && cat coverage/baz.txt"
   },
   "dependencies": {
-    "is-sorted": "^1.0.0"
+    "is-sorted": "^1.0.5"
   },
   "resolutions": {
     "tslib": ">=2"
