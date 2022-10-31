@@ -1,0 +1,38 @@
+name: Publish documentation
+on:
+  release:
+    types: [published]
+
+jobs:
+  push-branch:
+    name: Build & push docs
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version-file: .nvmrc
+          cache: yarn
+      - run: yarn install
+      - run: yarn build
+      - name: Clone docs repo
+        uses: actions/checkout@v3
+        with:
+          repository: oddbird/herman-docs
+          ssh-key: ${{ secrets.DOCS_REPO_PRIVATE_KEY }}
+          path: /tmp/docs-repo
+          ref: main
+      - name: Commit & push to docs repo
+        run: |
+          cd /tmp/docs-repo
+          rm -rf herman/docs
+          cp -r ${{ github.workspace }}/docs /tmp/docs-repo/herman/docs
+          git config user.name github-actions
+          git config user.email github-actions@github.com
+          git add -A
+          git commit --allow-empty -m "Update from https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+          git push origin
