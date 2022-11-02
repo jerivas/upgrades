@@ -21,7 +21,7 @@ jobs:
     steps:
       - name: Set ref from release
         if: github.event_name == 'release'
-        run: echo "REF=${{ github.ref }}" >> $GITHUB_ENV
+        run: echo "REF=${{ github.sha }}" >> $GITHUB_ENV
       - name: Set ref from manual input
         if: github.event_name == 'workflow_dispatch'
         run: echo "REF=${{ inputs.ref }}" >> $GITHUB_ENV
@@ -43,11 +43,14 @@ jobs:
           ref: main
       - name: Commit & push to docs repo
         run: |
+          SHA=$(git rev-parse HEAD)
           cd docs-repo
           rm -rf herman/docs
           cp -r ${{ github.workspace }}/docs herman/
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add -A
-          git commit --allow-empty -m "Update from https://github.com/${{ github.repository }}/commit/$REF\n\nFull log: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          git commit --allow-empty \
+          -m "Update from https://github.com/${{ github.repository }}/commit/$SHA" \
+          -m "Full log: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           git push origin
