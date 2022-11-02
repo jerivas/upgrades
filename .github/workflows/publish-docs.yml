@@ -1,6 +1,6 @@
 name: Publish documentation
 on:
-  workflow_dispatch: # Allow running on-demand
+  workflow_dispatch: # Run on-demand
     inputs:
       ref:
         description: Git ref to build docs from
@@ -19,15 +19,14 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:
-      - name: Set ref from release
+      - name: Check out from release
         if: github.event_name == 'release'
-        run: echo "REF=${{ github.sha }}" >> $GITHUB_ENV
-      - name: Set ref from manual input
+        uses: actions/checkout@v3
+      - name: Check out from manual input
         if: github.event_name == 'workflow_dispatch'
-        run: echo "REF=${{ inputs.ref }}" >> $GITHUB_ENV
-      - uses: actions/checkout@v3
+        uses: actions/checkout@v3
         with:
-          ref: ${{ env.REF }}
+          ref: ${{ inputs.ref }}
       - uses: actions/setup-node@v3
         with:
           node-version-file: .nvmrc
