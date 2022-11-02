@@ -1,5 +1,7 @@
 name: Publish documentation
 on:
+  release: # Run when stable releases are published
+    types: [released]
   workflow_dispatch: # Run on-demand
     inputs:
       ref:
@@ -7,8 +9,6 @@ on:
         required: true
         default: main
         type: string
-  release:
-    types: [released] # Run when stable releases are published
 
 jobs:
   push-branch:
@@ -36,14 +36,12 @@ jobs:
       - name: Clone docs repo
         uses: actions/checkout@v3
         with:
-          repository: oddbird/herman-docs
-          ssh-key: ${{ secrets.DOCS_REPO_DEPLOY_KEY }}
-          path: docs-repo
-          ref: main
+          path: docs-branch
+          ref: oddleventy-docs
       - name: Commit & push to docs repo
         run: |
           SHA=$(git rev-parse HEAD)
-          cd docs-repo
+          cd docs-branch
           rm -rf herman/docs
           cp -r ${{ github.workspace }}/docs herman/
           git config user.name github-actions
@@ -52,4 +50,4 @@ jobs:
           git commit --allow-empty \
           -m "Update from https://github.com/${{ github.repository }}/commit/$SHA" \
           -m "Full log: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-          git push origin
+          git push origin oddleventy-docs
