@@ -15,7 +15,7 @@
     "yarn": "^1.22"
   },
   "scripts": {
-    "build": "mkdir -p docs && echo \"Built at $(date)\" > docs/index.html",
+    "build": "mkdir -p docs && git rev-parse HEAD > docs/index.html",
     "test:py": "echo 'python coverage' > coverage.xml",
     "lint:nofix": "echo 'linting...'",
     "test:js:coverage": "mkdir coverage && echo 'foo' > coverage/foo.txt && echo 'baz' > coverage/baz.txt",

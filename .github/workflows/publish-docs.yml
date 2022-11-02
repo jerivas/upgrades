@@ -1,8 +1,14 @@
 name: Publish documentation
 on:
   workflow_dispatch: # Allow running on-demand
+    inputs:
+      ref:
+        description: Git ref to build docs from
+        required: true
+        default: main
+        type: string
   release:
-    types: [published] # Run when stable releases are published
+    types: [released] # Run when stable releases are published
 
 jobs:
   push-branch:
@@ -13,7 +19,15 @@ jobs:
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
     steps:
+      - name: Set ref from release
+        if: github.event_name == 'release'
+        run: echo "REF=${{ github.ref }}" >> $GITHUB_ENV
+      - name: Set ref from manual input
+        if: github.event_name == 'workflow_dispatch'
+        run: echo "REF=${{ inputs.ref }}" >> $GITHUB_ENV
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ env.REF }}
       - uses: actions/setup-node@v3
         with:
           node-version-file: .nvmrc
@@ -35,5 +49,5 @@ jobs:
           git config user.name github-actions
           git config user.email github-actions@github.com
           git add -A
-          git commit --allow-empty -m "Update from https://github.com/${{ github.repository }}/commit/${{ github.sha }}"
+          git commit --allow-empty -m "Update from https://github.com/${{ github.repository }}/commit/$REF\n\nFull log: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
           git push origin
